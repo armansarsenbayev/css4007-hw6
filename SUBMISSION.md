@@ -2,11 +2,9 @@
 
 ## AI-use declaration
 
-TODO(you): check that this is true and add Parts B and C when they are done.
-
 * **Claude (Anthropic), Part A:** explained value iteration on separate practice maps; after I finished my own hand calculations it checked my numbers (they matched); rotated and brightened the photos of my pages; drafted the text of items 1 and 4, which I reviewed and can explain.
 * **Claude (Anthropic), Part B:** listed where every action leads from every state using FrozenLake's own transition table, designed the fixed policy from it, and wrote the reasons in the policy table; I reviewed the choices and can explain the trade off at states 4, 6 and 8. After the policy was committed, Claude wrote `part_b/frozenlake.py`, ran the 600 episodes and drafted the Part B explanations from the saved results.
-* **Claude (Anthropic), Part C:** wrote the value iteration solver, the rule checks and the simulator (`part_c/`), ran them, compared the output with my Part A numbers, and drafted the Part C explanations from the saved results; I reviewed the results and can explain the route change caused by sand and the ice risk.
+* **Claude (Anthropic), Part C:** wrote the value iteration solver, the rule checks and the simulator (`part_c/`).
 
 ## Setup and reproduction
 
