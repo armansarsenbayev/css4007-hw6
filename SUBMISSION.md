@@ -5,6 +5,7 @@
 TODO(you): check that this is true and add Parts B and C when they are done.
 
 * **Claude (Anthropic), Part A:** explained value iteration on separate practice maps; after I finished my own hand calculations it checked my numbers (they matched); rotated and brightened the photos of my pages; drafted the text of items 1 and 4, which I reviewed and can explain.
+* **Claude (Anthropic), Part B:** listed where every action leads from every state using FrozenLake's own transition table, designed the fixed policy from it, and wrote the reasons in the policy table; I reviewed the choices and can explain the trade off at states 4, 6 and 8.
 
 ## Setup and reproduction
 
@@ -61,7 +62,34 @@ Two rounds do not prove that this is the final optimal policy:
 
 ### Fixed policy, written before the experiments
 
-State the action for each nonterminal state and your reasoning.
+Committed before any FrozenLake code or experiment. The same table is used, unchanged, in all four conditions; the code reads it from [part_b/fixed_policy.json](part_b/fixed_policy.json).
+
+Gymnasium action numbers: 0 = left, 1 = down, 2 = right, 3 = up. States are numbered row × 4 + column:
+
+```text
+  0 S |  1 F |  2 F |  3 F
+  4 F |  5 H |  6 F |  7 H
+  8 F |  9 F | 10 F | 11 H
+ 12 H | 13 F | 14 F | 15 G
+```
+
+| State | Action | Without slipping | With slipping (each outcome 1/3) | Reason |
+| --- | --- | --- | --- | --- |
+| 0 | down (1) | to 4 | 0, 1 or 4, no hole | first step of the main path, safe in both modes |
+| 1 | up (3) | stays on 1 | 0, 1 or 2, no hole | off the path: pressing against the top edge is the only action with no hole risk; slips drift back towards 0 |
+| 2 | up (3) | stays on 2 | 1, 2 or 3, no hole | off the path: same top edge trick, avoids state 6 completely |
+| 3 | up (3) | stays on 3 | 2 or 3, no hole | off the path: every other action can slip into hole 7 |
+| 4 | down (1) | to 8 | 4, 5 (hole) or 8 | on the main path; the only safe action (left) would leave the agent stuck on 4 forever without slipping, so I accept a 1/3 hole risk |
+| 6 | left (0) | to 5 (hole) | 2, 5 (hole) or 10 | off the path and never reached without slipping; every action here has a hole risk, left and right have the smallest one (1/3 instead of 2/3), and both slips lead back to safer states |
+| 8 | right (2) | to 9 | 4, 9 or 12 (hole) | on the main path; the only safe action (up) would send the agent back to 4 and loop forever without slipping, so I accept a 1/3 hole risk |
+| 9 | down (1) | to 13 | 8, 10 or 13, no hole | on the main path, safe in both modes |
+| 10 | left (0) | to 9 | 6, 9 or 14, no hole | off the path: the only action with no direct hole risk; it returns to the path at 9 or jumps ahead to 14 |
+| 13 | right (2) | to 14 | 9, 13 or 14, no hole | on the main path, safe in both modes |
+| 14 | right (2) | to 15 (goal) | 10, 14 or 15 (goal), no hole | last step; no outcome is a hole |
+
+**Main path without slipping:** 0 → 4 → 8 → 9 → 13 → 14 → 15, six steps, no hole on the way. So without slipping I expect this policy to reach the goal in every episode.
+
+**Trade off:** one table has to work in both modes. On the path, states 4 and 8 have no action that both moves forward and is safe when slipping, so I chose progress there and accepted a 1/3 hole risk per visit. Off the path I chose safety first: the top row presses into the top edge, so slips only move the agent sideways along the row until it reaches 0 and the main path. State 6 cannot be made safe, so it gets the smallest risk.
 
 ### Results
 
