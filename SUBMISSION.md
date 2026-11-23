@@ -6,6 +6,7 @@ TODO(you): check that this is true and add Parts B and C when they are done.
 
 * **Claude (Anthropic), Part A:** explained value iteration on separate practice maps; after I finished my own hand calculations it checked my numbers (they matched); rotated and brightened the photos of my pages; drafted the text of items 1 and 4, which I reviewed and can explain.
 * **Claude (Anthropic), Part B:** listed where every action leads from every state using FrozenLake's own transition table, designed the fixed policy from it, and wrote the reasons in the policy table; I reviewed the choices and can explain the trade off at states 4, 6 and 8. After the policy was committed, Claude wrote `part_b/frozenlake.py`, ran the 600 episodes and drafted the Part B explanations from the saved results.
+* **Claude (Anthropic), Part C:** wrote the value iteration solver, the rule checks and the simulator (`part_c/`), ran them, compared the output with my Part A numbers, and drafted the Part C explanations from the saved results; I reviewed the results and can explain the route change caused by sand and the ice risk.
 
 ## Setup and reproduction
 
@@ -22,6 +23,8 @@ python -m pip install -r requirements.txt
 Windows PowerShell: `python -m venv .venv`, then `.venv\Scripts\Activate.ps1`, then the same `pip install`.
 
 **Part B:** `python part_b/frozenlake.py` runs all 600 episodes and rewrites the files in `outputs/` starting with `part_b_`. The run is deterministic: the same seeds give the same table.
+
+**Part C:** `python part_c/run_part_c.py` runs the rule checks, the comparison with my paper values, value iteration on both maps and the simulations, and rewrites the files in `outputs/` starting with `part_c_`. It only needs numpy; it is also deterministic.
 
 ## Part A — Paper calculations
 
@@ -161,24 +164,93 @@ Outcomes that never happened: no hole with the fixed policy without slipping; no
 
 ## Part C — Custom solver
 
+Code: [part_c/gridworld.py](part_c/gridworld.py) (model, value iteration, policy extraction) and [part_c/run_part_c.py](part_c/run_part_c.py) (checks, paper comparison, solving, simulation). Run everything with `python part_c/run_part_c.py`; it rewrites the files in `outputs/` starting with `part_c_` and gives the same results every time.
+
+**Floor rules are data, not code.** Rewards, deterministic or slippery movement, the ice probabilities, terminal tiles and walls are read from `tiles` in [data/maps.json](data/maps.json). The solver never names a floor letter, so sand `D` and shallow water `W` needed no change to value iteration: the extended map simply uses their entries.
+
 ### Compare code with paper
 
-Show V1 and the requested V2 values. Explain discrepancies.
+The solver's V1 and V2 match my hand calculations exactly: 0 differences in all 9 V1 values and in all 12 action values of the three V2 tiles. Full output: [outputs/part_c_paper_comparison.txt](outputs/part_c_paper_comparison.txt).
+
+V1 from the solver:
+
+```text
+             1       2       3       4
+Row 1    -1.00   -1.00   10.00     G
+Row 2    -1.00     #     -1.00     H
+Row 3    -1.00   -1.00   -1.00   -1.00
+```
+
+| Tile | Up | Right | Down | Left | V2 (solver) | V2 (my paper) |
+| --- | --- | --- | --- | --- | --- | --- |
+| (1,2) mud | -3.9 | 8.0 | -3.9 | -1.9 | 8.0 | 8 |
+| (1,3) floor | 8.0 | 10.0 | -1.9 | -3.9 | 10.0 | 10 |
+| (2,3) ice | 5.21 | -7.39 | -2.71 | -0.91 | 5.21 | 5.21 |
+
+There were no discrepancies to correct. The places where I could have gone wrong on paper, bumping from mud into the edge or the wall (-3, not -1), and the ice slip into the wall that keeps the agent on the ice, give the same numbers in code.
 
 ### Values, policies and convergence
 
-Link both value/policy maps. Record iteration counts, final value changes and tie-breaking rule.
+| Map | Iterations | Largest change in the last full update | Converged | V(start) |
+| --- | --- | --- | --- | --- |
+| Paper map | 12 | 2.165e-07 | yes (below 0.000001, far from the 10,000 safeguard) | 1.5358 |
+| Extended map | 11 | 2.406e-07 | yes | 1.5020 |
+
+Full value maps, arrow maps and every Q value: [outputs/part_c_paper_map.txt](outputs/part_c_paper_map.txt) and [outputs/part_c_extended_map.txt](outputs/part_c_extended_map.txt).
+
+**Paper map** `.M.G / .#IH / S...`
+
+```text
+Final values                              Policy
+             1        2        3            1     2     3     4
+Row 1     4.200    8.000   10.000  G    .→    M→    .→    G
+Row 2     2.780      #      5.824  H    .↑    #     I↑    H
+Row 3     1.536    2.818    4.242  2.818 S→   .→    .↑    .←
+```
+
+**Extended map** `.M.G / .#IH / SD.W`
+
+```text
+Final values                              Policy
+             1        2        3            1     2     3     4
+Row 1     4.200    8.000   10.000  G    .→    M→    .→    G
+Row 2     2.780      #      5.824  H    .↑    #     I↑    H
+Row 3     1.502    2.818    4.242  2.818 S↑   D→    .↑    W←
+```
+
+**Policy extraction and ties.** After convergence I compute Q(s, a) for all four actions from the final values and pick the largest. Tie rule: actions whose Q is within 1e-9 of the best count as tied, all of them are listed, and the first one in the order up, right, down, left is used. On both maps no best action was tied (no `*` in the arrow maps), so the rule never had to decide.
 
 ### Simulation results
 
+Each computed policy was simulated with my own simulator using the known model: 3 batches of 50 episodes, episode seed 1000 × batch seed + i (the Part B scheme), 100 step limit, `numpy.random.default_rng(episode_seed)` for the slips. Discounted return = r0 + 0.9·r1 + 0.9²·r2 + ...
+
 | Map | Batch seed | Goals /50 | Holes /50 | Time limits /50 | Mean steps | Mean discounted return |
 | --- | --- | --- | --- | --- | --- | --- |
+| paper map | 11 | 47 | 3 | 0 | 5.04 | 2.230 |
+| paper map | 22 | 44 | 6 | 0 | 4.96 | 1.442 |
+| paper map | 33 | 42 | 8 | 0 | 4.88 | 0.970 |
+| extended map | 11 | 50 | 0 | 0 | 5.00 | 1.502 |
+| extended map | 22 | 50 | 0 | 0 | 5.00 | 1.502 |
+| extended map | 33 | 50 | 0 | 0 | 5.00 | 1.502 |
+
+Per episode rows: [outputs/part_c_episodes.csv](outputs/part_c_episodes.csv); everything in one file: [outputs/part_c_summary.json](outputs/part_c_summary.json).
 
 ### Explain your results
 
-Which values/actions changed with sand and water? Where did cost and risk matter? How do simulations relate to the computed values?
+**What changed with sand and water.** Rows 1 and 2 are identical on both maps: same values, same arrows. The only change that matters is at the start (3,1). On the paper map the best route is along the bottom row and then up over the ice: S → (3,2) → (3,3) → ice → (1,3) → G. On the extended map the first step of that route now enters sand (-2 instead of -1), so Q(start, right) drops from 1.5358 to 0.5358 and the start switches to up: S → (2,1) → (1,1) → mud → (1,3) → G. V(start) falls only a little, from 1.5358 to 1.5020, because the agent simply takes the other route. Water at (3,4) changes nothing on the chosen route: it only makes Q((3,3), right) much worse (-2.4642 instead of 1.5358), and that action was never chosen anyway. The arrows on D and W themselves are what to do if the agent ever stands there; the value of a tile is about leaving it, and the floor cost is paid when entering it.
+
+**Where cost and risk mattered.** On the paper map the two routes are almost equal: right is worth 1.5358 and up is worth 1.5020 at the start. The bottom route is cheaper (no mud) but risky, because it crosses the ice next to the hole: from the ice, "up" slips right into H with probability 0.1 and slips into the wall (stay and try again) with probability 0.1, so the chance of ending in the hole is 0.1 / 0.9 ≈ 11%. The top route is safe but pays -3 for the mud. Value iteration weighs both, and the cheap but risky route wins by only 0.034. Adding sand (an extra cost of 1 on the bottom route) is enough to flip the choice to the safe route. In the simulations this is very visible: 17 holes out of 150 (11.3%, close to the 11.1% from the model) on the paper map, and 0 holes out of 150 on the extended map.
+
+**How the policy handled ice.** On the paper map the policy uses the ice but chooses "up" there (Q = 5.8242), the action whose intended move goes to (1,3) and whose sideways slips are one wall (harmless) and one hole (10%). "Right" from the ice would go straight into the hole with probability 0.8 (Q = -6.9182). On the extended map the ice is still on the map with the same arrow, but the optimal route never visits it.
+
+**How the simulations relate to the computed values.** V(start) is an expected value over an infinite horizon; a simulation is a finite sample from 150 episodes with a 100 step limit. The 100 step limit hardly matters here: every episode ended within a few steps (no time limits) and 0.9^100 ≈ 0.00003, so rewards after step 100 would barely count. The real difference is sampling. On the paper map each episode is either a goal with return between 1.81 and 3.12 or a hole with return -10, so the batch means jump around (2.230, 1.442, 0.970) depending on how many holes happened (3, 6, 8), while the mean over all 150 episodes, 1.547, is close to V(start) = 1.536. On the extended map the chosen route is fully deterministic, so every episode returns exactly -1 - 0.9 - 3·0.81 - 0.729 + 10·0.6561 = 1.502, which equals V(start). So the simulations estimate the values; they are not the same thing, and the estimate is only exact when nothing random happens.
 
 ### Rule checks
 
-Show boundary/wall behavior, slip probabilities, floor rewards and terminal handling.
+All 24 checks pass; the full output is saved in [outputs/part_c_rule_checks.txt](outputs/part_c_rule_checks.txt) and is regenerated on every run.
+
+* **Walls and edges:** (1,2) mud up (edge) and down (wall) stay on (1,2) with reward -3; (2,1) right into the wall, (3,1) left and down, (1,1) up all stay in place with reward -1.
+* **Ice probabilities:** every ice action has outcomes 0.8, 0.1 and 0.1 that sum to 1; for example ice up gives 0.8 to (1,3), 0.1 stays on the ice (left slip hits the wall), 0.1 into the hole (2,4). Every action from every nonterminal state on both maps sums to 1.
+* **Floor rewards:** entering mud gives -3, sand -2, shallow water -5, ordinary floor -1, the goal exactly +10 (no extra floor cost) and the hole -10; sand and water moves are deterministic.
+* **Termination:** G and H return no outcomes (no actions, no further rewards), their values stay 0 in every round, and a simulated episode stops on the move that enters G or H.
 

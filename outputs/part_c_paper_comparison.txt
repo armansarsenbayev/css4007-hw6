@@ -1,0 +1,38 @@
+V1 from the solver (paper map):
+             1       2       3       4    
+Row 1    -1.00   -1.00   10.00     G    
+Row 2    -1.00     #     -1.00     H    
+Row 3    -1.00   -1.00   -1.00   -1.00  
+
+V1: solver vs my paper (Part A page 1)
+  (1,1): solver -1.0000, paper -1, match
+  (1,2): solver -1.0000, paper -1, match
+  (1,3): solver 10.0000, paper 10, match
+  (2,1): solver -1.0000, paper -1, match
+  (2,3): solver -1.0000, paper -1, match
+  (3,1): solver -1.0000, paper -1, match
+  (3,2): solver -1.0000, paper -1, match
+  (3,3): solver -1.0000, paper -1, match
+  (3,4): solver -1.0000, paper -1, match
+
+V2 at the three requested tiles: every action, solver vs paper (Part A pages 2 and 3)
+  (1,2) M:
+       up: solver -3.9000, paper -3.9, match
+    right: solver 8.0000, paper 8, match
+     down: solver -3.9000, paper -3.9, match
+     left: solver -1.9000, paper -1.9, match
+    V2 = 8.0000
+  (1,3) .:
+       up: solver 8.0000, paper 8, match
+    right: solver 10.0000, paper 10, match
+     down: solver -1.9000, paper -1.9, match
+     left: solver -3.9000, paper -3.9, match
+    V2 = 10.0000
+  (2,3) I:
+       up: solver 5.2100, paper 5.21, match
+    right: solver -7.3900, paper -7.39, match
+     down: solver -2.7100, paper -2.71, match
+     left: solver -0.9100, paper -0.91, match
+    V2 = 5.2100
+
+0 differences between the solver and my paper calculations
