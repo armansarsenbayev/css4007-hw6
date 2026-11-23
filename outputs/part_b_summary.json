@@ -1,0 +1,122 @@
+[
+  {
+    "is_slippery": false,
+    "policy": "random",
+    "batch_seed": 11,
+    "goals": 0,
+    "holes": 50,
+    "time_limits": 0,
+    "success_percent": 0.0,
+    "mean_steps": 7.98
+  },
+  {
+    "is_slippery": false,
+    "policy": "random",
+    "batch_seed": 22,
+    "goals": 0,
+    "holes": 50,
+    "time_limits": 0,
+    "success_percent": 0.0,
+    "mean_steps": 6.42
+  },
+  {
+    "is_slippery": false,
+    "policy": "random",
+    "batch_seed": 33,
+    "goals": 1,
+    "holes": 49,
+    "time_limits": 0,
+    "success_percent": 2.0,
+    "mean_steps": 6.66
+  },
+  {
+    "is_slippery": false,
+    "policy": "fixed",
+    "batch_seed": 11,
+    "goals": 50,
+    "holes": 0,
+    "time_limits": 0,
+    "success_percent": 100.0,
+    "mean_steps": 6.0
+  },
+  {
+    "is_slippery": false,
+    "policy": "fixed",
+    "batch_seed": 22,
+    "goals": 50,
+    "holes": 0,
+    "time_limits": 0,
+    "success_percent": 100.0,
+    "mean_steps": 6.0
+  },
+  {
+    "is_slippery": false,
+    "policy": "fixed",
+    "batch_seed": 33,
+    "goals": 50,
+    "holes": 0,
+    "time_limits": 0,
+    "success_percent": 100.0,
+    "mean_steps": 6.0
+  },
+  {
+    "is_slippery": true,
+    "policy": "random",
+    "batch_seed": 11,
+    "goals": 0,
+    "holes": 50,
+    "time_limits": 0,
+    "success_percent": 0.0,
+    "mean_steps": 8.3
+  },
+  {
+    "is_slippery": true,
+    "policy": "random",
+    "batch_seed": 22,
+    "goals": 2,
+    "holes": 48,
+    "time_limits": 0,
+    "success_percent": 4.0,
+    "mean_steps": 7.76
+  },
+  {
+    "is_slippery": true,
+    "policy": "random",
+    "batch_seed": 33,
+    "goals": 0,
+    "holes": 50,
+    "time_limits": 0,
+    "success_percent": 0.0,
+    "mean_steps": 6.74
+  },
+  {
+    "is_slippery": true,
+    "policy": "fixed",
+    "batch_seed": 11,
+    "goals": 3,
+    "holes": 45,
+    "time_limits": 2,
+    "success_percent": 6.0,
+    "mean_steps": 16.86
+  },
+  {
+    "is_slippery": true,
+    "policy": "fixed",
+    "batch_seed": 22,
+    "goals": 4,
+    "holes": 45,
+    "time_limits": 1,
+    "success_percent": 8.0,
+    "mean_steps": 22.78
+  },
+  {
+    "is_slippery": true,
+    "policy": "fixed",
+    "batch_seed": 33,
+    "goals": 1,
+    "holes": 49,
+    "time_limits": 0,
+    "success_percent": 2.0,
+    "mean_steps": 12.72
+  }
+]

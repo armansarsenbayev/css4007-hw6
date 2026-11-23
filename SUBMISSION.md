@@ -5,11 +5,23 @@
 TODO(you): check that this is true and add Parts B and C when they are done.
 
 * **Claude (Anthropic), Part A:** explained value iteration on separate practice maps; after I finished my own hand calculations it checked my numbers (they matched); rotated and brightened the photos of my pages; drafted the text of items 1 and 4, which I reviewed and can explain.
-* **Claude (Anthropic), Part B:** listed where every action leads from every state using FrozenLake's own transition table, designed the fixed policy from it, and wrote the reasons in the policy table; I reviewed the choices and can explain the trade off at states 4, 6 and 8.
+* **Claude (Anthropic), Part B:** listed where every action leads from every state using FrozenLake's own transition table, designed the fixed policy from it, and wrote the reasons in the policy table; I reviewed the choices and can explain the trade off at states 4, 6 and 8. After the policy was committed, Claude wrote `part_b/frozenlake.py`, ran the 600 episodes and drafted the Part B explanations from the saved results.
 
 ## Setup and reproduction
 
-Record dependency versions, installation commands and exact run commands.
+Versions used for the saved results: Python 3.13.18, gymnasium 1.4.0, numpy 2.5.3 (pinned in [requirements.txt](requirements.txt)). No API key is needed.
+
+macOS / Linux, from the repository root:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+Windows PowerShell: `python -m venv .venv`, then `.venv\Scripts\Activate.ps1`, then the same `pip install`.
+
+**Part B:** `python part_b/frozenlake.py` runs all 600 episodes and rewrites the files in `outputs/` starting with `part_b_`. The run is deterministic: the same seeds give the same table.
 
 ## Part A — Paper calculations
 
@@ -93,10 +105,59 @@ Gymnasium action numbers: 0 = left, 1 = down, 2 = right, 3 = up. States are numb
 
 ### Results
 
+FrozenLake-v1, `map_name="4x4"`, default rewards, 100 step limit. Each batch: episode seeds 1000 × batch seed + i for i = 0..49, the same lists in all four conditions; the random policy uses `numpy.random.default_rng(episode_seed)`.
+
 | Slippery? | Policy | Batch seed | Goals /50 | Holes /50 | Time limits /50 | Success % | Mean steps |
 | --- | --- | --- | --- | --- | --- | --- | --- |
+| no | random | 11 | 0 | 50 | 0 | 0% | 7.98 |
+| no | random | 22 | 0 | 50 | 0 | 0% | 6.42 |
+| no | random | 33 | 1 | 49 | 0 | 2% | 6.66 |
+| no | fixed | 11 | 50 | 0 | 0 | 100% | 6.00 |
+| no | fixed | 22 | 50 | 0 | 0 | 100% | 6.00 |
+| no | fixed | 33 | 50 | 0 | 0 | 100% | 6.00 |
+| yes | random | 11 | 0 | 50 | 0 | 0% | 8.30 |
+| yes | random | 22 | 2 | 48 | 0 | 4% | 7.76 |
+| yes | random | 33 | 0 | 50 | 0 | 0% | 6.74 |
+| yes | fixed | 11 | 3 | 45 | 2 | 6% | 16.86 |
+| yes | fixed | 22 | 4 | 45 | 1 | 8% | 22.78 |
+| yes | fixed | 33 | 1 | 49 | 0 | 2% | 12.72 |
 
-Link episode rows and example traces in outputs/. Explain slipping, variation across batches and why these runs do not train a policy.
+Files in `outputs/`:
+
+* [part_b_episodes.csv](outputs/part_b_episodes.csv): 600 rows, one per episode (condition, slippery flag, policy, batch seed, episode seed, steps, total reward, final state, outcome).
+* [part_b_summary.md](outputs/part_b_summary.md) and [part_b_summary.json](outputs/part_b_summary.json): the table above.
+* [part_b_traces.txt](outputs/part_b_traces.txt): the first goal, hole and time limit episode of every condition, or a note when that outcome never happened.
+* [part_b_example_episode.txt](outputs/part_b_example_episode.txt): one full episode with Gymnasium's text rendering (slippery, fixed policy, seed 11000).
+
+**A successful trace** (not slippery, fixed policy, seed 11000), the planned path exactly:
+
+```text
+step 1: state  0 -- down--> state  4, reward 0
+step 2: state  4 -- down--> state  8, reward 0
+step 3: state  8 --right--> state  9, reward 0
+step 4: state  9 -- down--> state 13, reward 0
+step 5: state 13 --right--> state 14, reward 0
+step 6: state 14 --right--> state 15, reward 1, terminated (goal)
+```
+
+**A failed trace** (slippery, random policy, seed 11000):
+
+```text
+step 1: state  0 --   up--> state  0, reward 0
+step 2: state  0 --right--> state  4, reward 0   (slipped down)
+step 3: state  4 -- down--> state  4, reward 0   (slipped left into the edge)
+step 4: state  4 --   up--> state  5, reward 0, terminated (hole)
+```
+
+Outcomes that never happened: no hole with the fixed policy without slipping; no time limit in any condition except slippery with the fixed policy (3 episodes in total).
+
+**What slipping changed.** Without slipping my fixed policy is perfect: 150 goals out of 150, always in 6 steps. With slipping it reaches the goal only 8 times out of 150 (2% to 8% per batch). Most failures are hole 5 (105 of 139 holes) and the rest are hole 12 (34). That matches the trade off I wrote before running: at state 4 I press down, and one time in three the agent slips right into hole 5; at state 8 I press right, and one time in three it slips down into hole 12; a slip from 8 back to 4 just gives hole 5 another chance. Slipping also makes episodes longer (mean 12.72 to 22.78 steps instead of 6), because the agent slides sideways and my top row actions (press up) only drift slowly back to the start. Three episodes even ran out of time while drifting along the top row (they ended on states 3 and 0). The random policy is bad in both modes (1 and 2 goals out of 150), so slipping barely changes it. The lesson for me: a policy that is safe on the deterministic path is not safe once moves are uncertain, and the safe actions at 4 and 8 (left at 4, up at 8) would loop forever without slipping, so no single table is good in both modes.
+
+**How consistent the batches were.** Without slipping the fixed policy gives exactly the same result in all three batches (50/50, 6.00 steps), because nothing random happens and the seeds have nothing to change. Everything else varies: the random policy without slipping got 0, 0 and 1 goals, and the fixed policy with slipping got 3, 4 and 1 goals with mean steps from 12.72 to 22.78. With only 50 episodes per batch, a difference of 1 to 3 goals is within normal chance, so I would not say that one batch seed is "better"; that is why the task asks for three batches and not one.
+
+**Why one successful episode is not enough.** Success here is a probability, not a fact about the policy. The random policy reached the goal in episode 33006 without slipping; if that had been the only episode I ran, the random policy would look perfect, while over 150 episodes it succeeded once. In the same way, one slippery success of my fixed policy (for example seed 11020) would hide the fact that it fails in 142 of 150 episodes (about 95%). Many episodes with fixed seeds are needed to estimate the success rate and to see how much it varies.
+
+**Why these runs are not training.** Both policies were fixed before any episode: the random policy always picks uniformly, and the fixed policy is read from `part_b/fixed_policy.json`, committed before the code. Nothing in the program updates an action from rewards or outcomes, so episode 600 uses exactly the same rules as episode 1. These runs only measure how good two given policies are. Training would mean changing the policy from experience (for example Q learning) or computing a better policy from the model, which is what value iteration does in Part C.
 
 ## Part C — Custom solver
 

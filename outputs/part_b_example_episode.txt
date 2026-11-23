@@ -1,0 +1,274 @@
+FrozenLake-v1 4x4, is_slippery=True, fixed policy, episode seed 11000.
+[X] marks the agent. Outcome: hole after 38 steps.
+
+Step 0:
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 1:
+  (Down)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 2:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 3:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 4:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 5:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 6:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 7:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 8:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 9:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 10:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 11:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 12:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 13:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 14:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 15:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 16:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 17:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 18:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 19:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 20:
+  (Up)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 21:
+  (Up)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 22:
+  (Down)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 23:
+  (Down)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 24:
+  (Up)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 25:
+  (Down)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 26:
+  (Up)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 27:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 28:
+  (Up)
+SFF[F]
+FHFH
+FFFH
+HFFG
+
+Step 29:
+  (Up)
+SF[F]F
+FHFH
+FFFH
+HFFG
+
+Step 30:
+  (Up)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 31:
+  (Up)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 32:
+  (Down)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 33:
+  (Up)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 34:
+  (Down)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 35:
+  (Down)
+S[F]FF
+FHFH
+FFFH
+HFFG
+
+Step 36:
+  (Up)
+[S]FFF
+FHFH
+FFFH
+HFFG
+
+Step 37:
+  (Down)
+SFFF
+[F]HFH
+FFFH
+HFFG
+
+Step 38:
+  (Down)
+SFFF
+F[H]FH
+FFFH
+HFFG
