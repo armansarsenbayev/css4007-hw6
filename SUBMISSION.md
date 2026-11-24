@@ -196,27 +196,49 @@ There were no discrepancies to correct. The places where I could have gone wrong
 
 Full value maps, arrow maps and every Q value: [outputs/part_c_paper_map.txt](outputs/part_c_paper_map.txt) and [outputs/part_c_extended_map.txt](outputs/part_c_extended_map.txt).
 
+Values include the discount 0.9: every value equals the reward of the best move plus 0.9 times the value of where it lands, for example V(1,2) = -1 + 0.9 · 10 = 8 and V(1,1) = -3 + 0.9 · 8 = 4.2. The letter in brackets is the tile type; G and H are terminal (value 0, no action).
+
 **Paper map** `.M.G / .#IH / S...`
 
-```text
-Final values                              Policy
-             1        2        3            1     2     3     4
-Row 1     4.200    8.000   10.000  G    .→    M→    .→    G
-Row 2     2.780      #      5.824  H    .↑    #     I↑    H
-Row 3     1.536    2.818    4.242  2.818 S→   .→    .↑    .←
-```
+Final values:
+
+| Row | Col 1 | Col 2 | Col 3 | Col 4 |
+| --- | --- | --- | --- | --- |
+| 1 | 4.200 (.) | 8.000 (M) | 10.000 (.) | G |
+| 2 | 2.780 (.) | # | 5.824 (I) | H |
+| 3 | 1.536 (S) | 2.818 (.) | 4.242 (.) | 2.818 (.) |
+
+Policy:
+
+| Row | Col 1 | Col 2 | Col 3 | Col 4 |
+| --- | --- | --- | --- | --- |
+| 1 | → | → | → | G |
+| 2 | ↑ | # | ↑ | H |
+| 3 | → | → | ↑ | ← |
+
+Route from the start: S (3,1) → (3,2) → (3,3) → ice (2,3) → (1,3) → G.
 
 **Extended map** `.M.G / .#IH / SD.W`
 
-```text
-Final values                              Policy
-             1        2        3            1     2     3     4
-Row 1     4.200    8.000   10.000  G    .→    M→    .→    G
-Row 2     2.780      #      5.824  H    .↑    #     I↑    H
-Row 3     1.502    2.818    4.242  2.818 S↑   D→    .↑    W←
-```
+Final values:
 
-**Policy extraction and ties.** After convergence I compute Q(s, a) for all four actions from the final values and pick the largest. Tie rule: actions whose Q is within 1e-9 of the best count as tied, all of them are listed, and the first one in the order up, right, down, left is used. On both maps no best action was tied (no `*` in the arrow maps), so the rule never had to decide.
+| Row | Col 1 | Col 2 | Col 3 | Col 4 |
+| --- | --- | --- | --- | --- |
+| 1 | 4.200 (.) | 8.000 (M) | 10.000 (.) | G |
+| 2 | 2.780 (.) | # | 5.824 (I) | H |
+| 3 | 1.502 (S) | 2.818 (D) | 4.242 (.) | 2.818 (W) |
+
+Policy:
+
+| Row | Col 1 | Col 2 | Col 3 | Col 4 |
+| --- | --- | --- | --- | --- |
+| 1 | → | → | → | G |
+| 2 | ↑ | # | ↑ | H |
+| 3 | ↑ | → | ↑ | ← |
+
+Route from the start: S (3,1) → (2,1) → (1,1) → mud (1,2) → (1,3) → G.
+
+**Policy extraction and ties.** After convergence I compute Q(s, a) for all four actions from the final values and pick the largest. Tie rule: actions whose Q is within 1e-9 of the best count as tied, all of them are listed, and the first one in the order up, right, down, left is used. On both maps no best action was tied (the arrow maps in the output files would mark a tie with `*`), so the rule never had to decide.
 
 ### Simulation results
 
